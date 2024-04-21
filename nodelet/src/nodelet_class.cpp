@@ -27,27 +27,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <nodelet/nodelet.h>
 #include <nodelet/detail/callback_queue.h>
 #include <nodelet/detail/callback_queue_manager.h>
+#include <nodelet/nodelet.h>
 
-#include <ros/ros.h>
 #include <ros/callback_queue.h>
+#include <ros/ros.h>
 
 namespace nodelet
 {
 
-Nodelet::Nodelet ()
-: inited_(false)
-, nodelet_name_("uninitialized")
-{
-}
+Nodelet::Nodelet() : inited_(false), nodelet_name_("uninitialized") {}
 
-Nodelet::~Nodelet()
-{
-}
+Nodelet::~Nodelet() {}
 
-ros::CallbackQueueInterface& Nodelet::getSTCallbackQueue () const
+ros::CallbackQueueInterface& Nodelet::getSTCallbackQueue() const
 {
   if (!inited_)
   {
@@ -57,7 +51,7 @@ ros::CallbackQueueInterface& Nodelet::getSTCallbackQueue () const
   return *nh_->getCallbackQueue();
 }
 
-ros::CallbackQueueInterface& Nodelet::getMTCallbackQueue () const
+ros::CallbackQueueInterface& Nodelet::getMTCallbackQueue() const
 {
   if (!inited_)
   {
@@ -104,8 +98,11 @@ ros::NodeHandle& Nodelet::getMTPrivateNodeHandle() const
   return *mt_private_nh_;
 }
 
-void Nodelet::init(const std::string& name, const M_string& remapping_args, const V_string& my_argv,
-                   ros::CallbackQueueInterface* st_queue, ros::CallbackQueueInterface* mt_queue)
+void Nodelet::init(const std::string& name,
+                   const M_string& remapping_args,
+                   const V_string& my_argv,
+                   ros::CallbackQueueInterface* st_queue,
+                   ros::CallbackQueueInterface* mt_queue)
 {
   if (inited_)
   {
@@ -129,9 +126,19 @@ void Nodelet::init(const std::string& name, const M_string& remapping_args, cons
   mt_private_nh_->setCallbackQueue(mt_queue);
   mt_nh_->setCallbackQueue(mt_queue);
 
-  NODELET_DEBUG ("Nodelet initializing");
+  NODELET_DEBUG("Nodelet initializing");
   inited_ = true;
-  this->onInit ();
+  this->onInit();
 }
 
+void Nodelet::deinit()
+{
+  if (!inited_)
+  {
+    throw UninitializedException("deinit");
+  }
+
+  NODELET_DEBUG("Nodelet deinitializing");
+  this->onDeInit();
+}
 } // namespace nodelet

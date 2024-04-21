@@ -27,18 +27,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <nodelet/loader.h>
-#include <nodelet/nodelet.h>
+#include <bondcpp/bond.h>
 #include <nodelet/detail/callback_queue.h>
 #include <nodelet/detail/callback_queue_manager.h>
+#include <nodelet/loader.h>
+#include <nodelet/nodelet.h>
 #include <pluginlib/class_loader.hpp>
-#include <bondcpp/bond.h>
 
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
-#include <nodelet/NodeletLoad.h>
 #include <nodelet/NodeletList.h>
+#include <nodelet/NodeletLoad.h>
 #include <nodelet/NodeletUnload.h>
+#include <ros/callback_queue.h>
+#include <ros/ros.h>
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/utility.hpp>
@@ -73,10 +73,8 @@ typedef boost::shared_ptr<Nodelet> NodeletPtr;
 class LoaderROS
 {
 public:
-  LoaderROS(Loader* parent, const ros::NodeHandle& nh)
-  : parent_(parent)
-  , nh_(nh)
-  , bond_spinner_(1, &bond_callback_queue_)
+  LoaderROS(Loader* parent, const ros::NodeHandle& nh) :
+      parent_(parent), nh_(nh), bond_spinner_(1, &bond_callback_queue_)
   {
     load_server_ = nh_.advertiseService("load_nodelet", &LoaderROS::serviceLoad, this);
     unload_server_ = nh_.advertiseService("unload_nodelet", &LoaderROS::serviceUnload, this);
@@ -86,8 +84,7 @@ public:
   }
 
 private:
-  bool serviceLoad(nodelet::NodeletLoad::Request &req,
-                   nodelet::NodeletLoad::Response &res)
+  bool serviceLoad(nodelet::NodeletLoad::Request& req, nodelet::NodeletLoad::Response& res)
   {
     boost::mutex::scoped_lock lock(lock_);
 
@@ -101,8 +98,11 @@ private:
     {
       for (size_t i = 0; i < req.remap_source_args.size(); ++i)
       {
-        remappings[ros::names::resolve(req.remap_source_args[i])] = ros::names::resolve(req.remap_target_args[i]);
-        ROS_DEBUG("%s:%s\n", ros::names::resolve(req.remap_source_args[i]).c_str(), remappings[ros::names::resolve(req.remap_source_args[i])].c_str());
+        remappings[ros::names::resolve(req.remap_source_args[i])] =
+            ros::names::resolve(req.remap_target_args[i]);
+        ROS_DEBUG("%s:%s\n",
+                  ros::names::resolve(req.remap_source_args[i]).c_str(),
+                  remappings[ros::names::resolve(req.remap_source_args[i])].c_str());
       }
     }
 
@@ -120,8 +120,7 @@ private:
     return res.success;
   }
 
-  bool serviceUnload(nodelet::NodeletUnload::Request &req,
-                     nodelet::NodeletUnload::Response &res)
+  bool serviceUnload(nodelet::NodeletUnload::Request& req, nodelet::NodeletUnload::Response& res)
   {
     res.success = unload(req.name);
     return res.success;
@@ -140,18 +139,18 @@ private:
 
     // break the bond, if there is one
     M_stringToBond::iterator it = bond_map_.find(name);
-    if (it != bond_map_.end()) {
-        // disable callback for broken bond, as we are breaking it intentially now
-        it->second->setBrokenCallback(boost::function<void(void)>());
-        // erase (and break) bond
-        bond_map_.erase(name);
+    if (it != bond_map_.end())
+    {
+      // disable callback for broken bond, as we are breaking it intentially now
+      it->second->setBrokenCallback(boost::function<void(void)>());
+      // erase (and break) bond
+      bond_map_.erase(name);
     }
 
     return success;
   }
 
-  bool serviceList(nodelet::NodeletList::Request &,
-                   nodelet::NodeletList::Response &res)
+  bool serviceList(nodelet::NodeletList::Request&, nodelet::NodeletList::Response& res)
   {
     res.nodelets = parent_->listLoadedNodelets();
     return true;
@@ -180,11 +179,11 @@ struct ManagedNodelet : boost::noncopyable
   detail::CallbackQueueManager* callback_manager;
 
   /// @todo Maybe addQueue/removeQueue should be done by CallbackQueue
-  ManagedNodelet(NodeletPtr nodelet, detail::CallbackQueueManager* cqm)
-    : st_queue(new detail::CallbackQueue(cqm, nodelet))
-    , mt_queue(new detail::CallbackQueue(cqm, nodelet))
-    , nodelet(std::move(nodelet))
-    , callback_manager(cqm)
+  ManagedNodelet(NodeletPtr nodelet, detail::CallbackQueueManager* cqm) :
+      st_queue(new detail::CallbackQueue(cqm, nodelet)),
+      mt_queue(new detail::CallbackQueue(cqm, nodelet)),
+      nodelet(std::move(nodelet)),
+      callback_manager(cqm)
   {
     // NOTE: Can't do this in CallbackQueue constructor because the shared_ptr to
     // it doesn't exist then.
@@ -203,8 +202,8 @@ struct Loader::Impl
 {
   boost::shared_ptr<LoaderROS> services_;
 
-  boost::function<boost::shared_ptr<Nodelet> (const std::string& lookup_name)> create_instance_;
-  boost::function<void ()> refresh_classes_;
+  boost::function<boost::shared_ptr<Nodelet>(const std::string& lookup_name)> create_instance_;
+  boost::function<void()> refresh_classes_;
   boost::shared_ptr<detail::CallbackQueueManager> callback_manager_; // Must outlive nodelets_
 
   typedef boost::ptr_map<std::string, ManagedNodelet> M_stringToNodelet;
@@ -220,8 +219,9 @@ struct Loader::Impl
     refresh_classes_ = boost::bind(&Loader::refreshDeclaredClasses, loader);
   }
 
-  Impl(const boost::function<boost::shared_ptr<Nodelet> (const std::string& lookup_name)>& create_instance)
-    : create_instance_(create_instance)
+  Impl(const boost::function<boost::shared_ptr<Nodelet>(const std::string& lookup_name)>&
+           create_instance) :
+      create_instance_(create_instance)
   {
   }
 
@@ -230,15 +230,15 @@ struct Loader::Impl
     int num_threads_param;
     server_nh.param("num_worker_threads", num_threads_param, 0);
     callback_manager_.reset(new detail::CallbackQueueManager(num_threads_param));
-    ROS_INFO("Initializing nodelet with %d worker threads.", (int)callback_manager_->getNumWorkerThreads());
+    ROS_INFO("Initializing nodelet with %d worker threads.",
+             (int)callback_manager_->getNumWorkerThreads());
 
     services_.reset(new LoaderROS(parent, server_nh));
   }
 };
 
 /// @todo Instance of ROS API-related constructors, just take #threads for the manager
-Loader::Loader(bool provide_ros_api)
-  : impl_(new Impl)
+Loader::Loader(bool provide_ros_api) : impl_(new Impl)
 {
   if (provide_ros_api)
     impl_->advertiseRosApi(this, ros::NodeHandle("~"));
@@ -246,24 +246,24 @@ Loader::Loader(bool provide_ros_api)
     impl_->callback_manager_.reset(new detail::CallbackQueueManager);
 }
 
-Loader::Loader(const ros::NodeHandle& server_nh)
-  : impl_(new Impl)
+Loader::Loader(const ros::NodeHandle& server_nh) : impl_(new Impl)
 {
   impl_->advertiseRosApi(this, server_nh);
 }
 
-Loader::Loader(const boost::function<boost::shared_ptr<Nodelet> (const std::string& lookup_name)>& create_instance)
-  : impl_(new Impl(create_instance))
+Loader::Loader(const boost::function<boost::shared_ptr<Nodelet>(const std::string& lookup_name)>&
+                   create_instance) :
+    impl_(new Impl(create_instance))
 {
   impl_->callback_manager_.reset(new detail::CallbackQueueManager);
 }
 
-Loader::~Loader()
-{
-}
+Loader::~Loader() {}
 
-bool Loader::load(const std::string &name, const std::string& type, const ros::M_string& remappings,
-                  const std::vector<std::string> & my_argv)
+bool Loader::load(const std::string& name,
+                  const std::string& type,
+                  const ros::M_string& remappings,
+                  const std::vector<std::string>& my_argv)
 {
   boost::mutex::scoped_lock lock(lock_);
   if (impl_->nodelets_.count(name) > 0)
@@ -280,9 +280,10 @@ bool Loader::load(const std::string &name, const std::string& type, const ros::M
   catch (std::runtime_error& e)
   {
     // If we cannot refresh the nodelet cache, fail immediately
-    if(!impl_->refresh_classes_)
+    if (!impl_->refresh_classes_)
     {
-      ROS_ERROR("Failed to load nodelet [%s] of type [%s]: %s", name.c_str(), type.c_str(), e.what());
+      ROS_ERROR(
+          "Failed to load nodelet [%s] of type [%s]: %s", name.c_str(), type.c_str(), e.what());
       return false;
     }
 
@@ -297,7 +298,10 @@ bool Loader::load(const std::string &name, const std::string& type, const ros::M
       // dlopen() can return inconsistent results currently (see
       // https://sourceware.org/bugzilla/show_bug.cgi?id=17833), so make sure
       // that we display the messages of both exceptions to the user.
-      ROS_ERROR("Failed to load nodelet [%s] of type [%s] even after refreshing the cache: %s", name.c_str(), type.c_str(), e2.what());
+      ROS_ERROR("Failed to load nodelet [%s] of type [%s] even after refreshing the cache: %s",
+                name.c_str(),
+                type.c_str(),
+                e2.what());
       ROS_ERROR("The error before refreshing the cache was: %s", e.what());
       return false;
     }
@@ -311,38 +315,42 @@ bool Loader::load(const std::string &name, const std::string& type, const ros::M
 
   ManagedNodelet* mn = new ManagedNodelet(std::move(p), impl_->callback_manager_.get());
   impl_->nodelets_.insert(const_cast<std::string&>(name), mn); // mn now owned by boost::ptr_map
-  try {
+  try
+  {
 
     mn->nodelet->init(name, remappings, my_argv, mn->st_queue.get(), mn->mt_queue.get());
 
     ROS_DEBUG("Done initing nodelet %s", name.c_str());
-  } catch(...) {
+  }
+  catch (...)
+  {
     Impl::M_stringToNodelet::iterator it = impl_->nodelets_.find(name);
     if (it != impl_->nodelets_.end())
     {
       impl_->nodelets_.erase(it);
-      ROS_DEBUG ("Failed to initialize nodelet %s", name.c_str ());
+      ROS_DEBUG("Failed to initialize nodelet %s", name.c_str());
       return (false);
     }
   }
   return true;
 }
 
-bool Loader::unload (const std::string & name)
+bool Loader::unload(const std::string& name)
 {
-  boost::mutex::scoped_lock lock (lock_);
+  boost::mutex::scoped_lock lock(lock_);
   Impl::M_stringToNodelet::iterator it = impl_->nodelets_.find(name);
   if (it != impl_->nodelets_.end())
   {
+    it->second->nodelet->deinit();
     impl_->nodelets_.erase(it);
-    ROS_DEBUG ("Done unloading nodelet %s", name.c_str ());
+    ROS_DEBUG("Done unloading nodelet %s", name.c_str());
     return (true);
   }
 
   return (false);
 }
 
-bool Loader::clear ()
+bool Loader::clear()
 {
   boost::mutex::scoped_lock lock(lock_);
   impl_->nodelets_.clear();
@@ -351,7 +359,7 @@ bool Loader::clear ()
 
 std::vector<std::string> Loader::listLoadedNodelets()
 {
-  boost::mutex::scoped_lock lock (lock_);
+  boost::mutex::scoped_lock lock(lock_);
   std::vector<std::string> output;
   Impl::M_stringToNodelet::iterator it = impl_->nodelets_.begin();
   for (; it != impl_->nodelets_.end(); ++it)
@@ -362,4 +370,3 @@ std::vector<std::string> Loader::listLoadedNodelets()
 }
 
 } // namespace nodelet
-

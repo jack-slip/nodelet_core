@@ -30,32 +30,35 @@
 #ifndef NODELET_NODELET_H
 #define NODELET_NODELET_H
 
-#include "nodeletdecl.h"
 #include "exception.h"
+#include "nodeletdecl.h"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
-#include <ros/console.h>
 #include <boost/shared_ptr.hpp>
+#include <ros/console.h>
 
 namespace ros
 {
 class NodeHandle;
 class CallbackQueueInterface;
-}
+} // namespace ros
 
 #define NODELET_DEBUG(...) ROS_DEBUG_NAMED(getName(), __VA_ARGS__)
 #define NODELET_DEBUG_STREAM(...) ROS_DEBUG_STREAM_NAMED(getName(), __VA_ARGS__)
 #define NODELET_DEBUG_ONCE(...) ROS_DEBUG_ONCE_NAMED(getName(), __VA_ARGS__)
 #define NODELET_DEBUG_STREAM_ONCE(...) ROS_DEBUG_STREAM_ONCE_NAMED(getName(), __VA_ARGS__)
 #define NODELET_DEBUG_COND(cond, ...) ROS_DEBUG_COND_NAMED(cond, getName(), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_COND(cond, ...) ROS_DEBUG_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_COND(cond, ...)                                                       \
+  ROS_DEBUG_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
 #define NODELET_DEBUG_THROTTLE(rate, ...) ROS_DEBUG_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_THROTTLE(rate, ...) ROS_DEBUG_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_THROTTLE(rate, ...)                                                   \
+  ROS_DEBUG_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
 #define NODELET_DEBUG_FILTER(filter, ...) ROS_DEBUG_FILTER_NAMED(filter, getName(), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_FILTER(filter, ...) ROS_DEBUG_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_FILTER(filter, ...)                                                   \
+  ROS_DEBUG_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
 
 #define NODELET_INFO(...) ROS_INFO_NAMED(getName(), __VA_ARGS__)
 #define NODELET_INFO_STREAM(...) ROS_INFO_STREAM_NAMED(getName(), __VA_ARGS__)
@@ -64,9 +67,11 @@ class CallbackQueueInterface;
 #define NODELET_INFO_COND(cond, ...) ROS_INFO_COND_NAMED(cond, getName(), __VA_ARGS__)
 #define NODELET_INFO_STREAM_COND(cond, ...) ROS_INFO_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
 #define NODELET_INFO_THROTTLE(rate, ...) ROS_INFO_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
-#define NODELET_INFO_STREAM_THROTTLE(rate, ...) ROS_INFO_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
+#define NODELET_INFO_STREAM_THROTTLE(rate, ...)                                                    \
+  ROS_INFO_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
 #define NODELET_INFO_FILTER(filter, ...) ROS_INFO_FILTER_NAMED(filter, getName(), __VA_ARGS__)
-#define NODELET_INFO_STREAM_FILTER(filter, ...) ROS_INFO_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
+#define NODELET_INFO_STREAM_FILTER(filter, ...)                                                    \
+  ROS_INFO_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
 
 #define NODELET_WARN(...) ROS_WARN_NAMED(getName(), __VA_ARGS__)
 #define NODELET_WARN_STREAM(...) ROS_WARN_STREAM_NAMED(getName(), __VA_ARGS__)
@@ -75,87 +80,140 @@ class CallbackQueueInterface;
 #define NODELET_WARN_COND(cond, ...) ROS_WARN_COND_NAMED(cond, getName(), __VA_ARGS__)
 #define NODELET_WARN_STREAM_COND(cond, ...) ROS_WARN_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
 #define NODELET_WARN_THROTTLE(rate, ...) ROS_WARN_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
-#define NODELET_WARN_STREAM_THROTTLE(rate, ...) ROS_WARN_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
+#define NODELET_WARN_STREAM_THROTTLE(rate, ...)                                                    \
+  ROS_WARN_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
 #define NODELET_WARN_FILTER(filter, ...) ROS_WARN_FILTER_NAMED(filter, getName(), __VA_ARGS__)
-#define NODELET_WARN_STREAM_FILTER(filter, ...) ROS_WARN_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
+#define NODELET_WARN_STREAM_FILTER(filter, ...)                                                    \
+  ROS_WARN_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
 
 #define NODELET_ERROR(...) ROS_ERROR_NAMED(getName(), __VA_ARGS__)
 #define NODELET_ERROR_STREAM(...) ROS_ERROR_STREAM_NAMED(getName(), __VA_ARGS__)
 #define NODELET_ERROR_ONCE(...) ROS_ERROR_ONCE_NAMED(getName(), __VA_ARGS__)
 #define NODELET_ERROR_STREAM_ONCE(...) ROS_ERROR_STREAM_ONCE_NAMED(getName(), __VA_ARGS__)
 #define NODELET_ERROR_COND(cond, ...) ROS_ERROR_COND_NAMED(cond, getName(), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_COND(cond, ...) ROS_ERROR_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_COND(cond, ...)                                                       \
+  ROS_ERROR_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
 #define NODELET_ERROR_THROTTLE(rate, ...) ROS_ERROR_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_THROTTLE(rate, ...) ROS_ERROR_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_THROTTLE(rate, ...)                                                   \
+  ROS_ERROR_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
 #define NODELET_ERROR_FILTER(filter, ...) ROS_ERROR_FILTER_NAMED(filter, getName(), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_FILTER(filter, ...) ROS_ERROR_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_FILTER(filter, ...)                                                   \
+  ROS_ERROR_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
 
 #define NODELET_FATAL(...) ROS_FATAL_NAMED(getName(), __VA_ARGS__)
 #define NODELET_FATAL_STREAM(...) ROS_FATAL_STREAM_NAMED(getName(), __VA_ARGS__)
 #define NODELET_FATAL_ONCE(...) ROS_FATAL_ONCE_NAMED(getName(), __VA_ARGS__)
 #define NODELET_FATAL_STREAM_ONCE(...) ROS_FATAL_STREAM_ONCE_NAMED(getName(), __VA_ARGS__)
 #define NODELET_FATAL_COND(cond, ...) ROS_FATAL_COND_NAMED(cond, getName(), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_COND(cond, ...) ROS_FATAL_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_COND(cond, ...)                                                       \
+  ROS_FATAL_STREAM_COND_NAMED(cond, getName(), __VA_ARGS__)
 #define NODELET_FATAL_THROTTLE(rate, ...) ROS_FATAL_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_THROTTLE(rate, ...) ROS_FATAL_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_THROTTLE(rate, ...)                                                   \
+  ROS_FATAL_STREAM_THROTTLE_NAMED(rate, getName(), __VA_ARGS__)
 #define NODELET_FATAL_FILTER(filter, ...) ROS_FATAL_FILTER_NAMED(filter, getName(), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_FILTER(filter, ...) ROS_FATAL_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_FILTER(filter, ...)                                                   \
+  ROS_FATAL_STREAM_FILTER_NAMED(filter, getName(), __VA_ARGS__)
 
 // named versions of the macros
 #define NODELET_DEBUG_NAMED(suffix, ...) ROS_DEBUG_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_NAMED(suffix, ...) ROS_DEBUG_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_ONCE_NAMED(suffix, ...) ROS_DEBUG_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_ONCE_NAMED(suffix, ...) ROS_DEBUG_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_COND_NAMED(cond, suffix, ...) ROS_DEBUG_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_COND_NAMED(cond, suffix, ...) ROS_DEBUG_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_THROTTLE_NAMED(rate, suffix, ...) ROS_DEBUG_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_THROTTLE_NAMED(rate, suffix, ...) ROS_DEBUG_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_FILTER_NAMED(filter, suffix, ...) ROS_DEBUG_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_DEBUG_STREAM_FILTER_NAMED(filter, suffix, ...) ROS_DEBUG_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_NAMED(suffix, ...)                                                    \
+  ROS_DEBUG_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_ONCE_NAMED(suffix, ...)                                                      \
+  ROS_DEBUG_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_ONCE_NAMED(suffix, ...)                                               \
+  ROS_DEBUG_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_COND_NAMED(cond, suffix, ...)                                                \
+  ROS_DEBUG_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_COND_NAMED(cond, suffix, ...)                                         \
+  ROS_DEBUG_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_THROTTLE_NAMED(rate, suffix, ...)                                            \
+  ROS_DEBUG_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_THROTTLE_NAMED(rate, suffix, ...)                                     \
+  ROS_DEBUG_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_FILTER_NAMED(filter, suffix, ...)                                            \
+  ROS_DEBUG_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_DEBUG_STREAM_FILTER_NAMED(filter, suffix, ...)                                     \
+  ROS_DEBUG_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
 
 #define NODELET_INFO_NAMED(suffix, ...) ROS_INFO_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_STREAM_NAMED(suffix, ...) ROS_INFO_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_ONCE_NAMED(suffix, ...) ROS_INFO_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_STREAM_ONCE_NAMED(suffix, ...) ROS_INFO_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_COND_NAMED(cond, suffix, ...) ROS_INFO_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_STREAM_COND_NAMED(cond, suffix, ...) ROS_INFO_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_THROTTLE_NAMED(rate, suffix, ...) ROS_INFO_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_STREAM_THROTTLE_NAMED(rate, suffix, ...) ROS_INFO_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_FILTER_NAMED(filter, suffix, ...) ROS_INFO_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_INFO_STREAM_FILTER_NAMED(filter, suffix, ...) ROS_INFO_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_STREAM_NAMED(suffix, ...)                                                     \
+  ROS_INFO_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_ONCE_NAMED(suffix, ...)                                                       \
+  ROS_INFO_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_STREAM_ONCE_NAMED(suffix, ...)                                                \
+  ROS_INFO_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_COND_NAMED(cond, suffix, ...)                                                 \
+  ROS_INFO_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_STREAM_COND_NAMED(cond, suffix, ...)                                          \
+  ROS_INFO_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_THROTTLE_NAMED(rate, suffix, ...)                                             \
+  ROS_INFO_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_STREAM_THROTTLE_NAMED(rate, suffix, ...)                                      \
+  ROS_INFO_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_FILTER_NAMED(filter, suffix, ...)                                             \
+  ROS_INFO_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_INFO_STREAM_FILTER_NAMED(filter, suffix, ...)                                      \
+  ROS_INFO_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
 
 #define NODELET_WARN_NAMED(suffix, ...) ROS_WARN_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_STREAM_NAMED(suffix, ...) ROS_WARN_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_ONCE_NAMED(suffix, ...) ROS_WARN_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_STREAM_ONCE_NAMED(suffix, ...) ROS_WARN_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_COND_NAMED(cond, suffix, ...) ROS_WARN_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_STREAM_COND_NAMED(cond, suffix, ...) ROS_WARN_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_THROTTLE_NAMED(rate, suffix, ...) ROS_WARN_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_STREAM_THROTTLE_NAMED(rate, suffix, ...) ROS_WARN_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_FILTER_NAMED(filter, suffix, ...) ROS_WARN_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_WARN_STREAM_FILTER_NAMED(filter, suffix, ...) ROS_WARN_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_STREAM_NAMED(suffix, ...)                                                     \
+  ROS_WARN_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_ONCE_NAMED(suffix, ...)                                                       \
+  ROS_WARN_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_STREAM_ONCE_NAMED(suffix, ...)                                                \
+  ROS_WARN_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_COND_NAMED(cond, suffix, ...)                                                 \
+  ROS_WARN_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_STREAM_COND_NAMED(cond, suffix, ...)                                          \
+  ROS_WARN_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_THROTTLE_NAMED(rate, suffix, ...)                                             \
+  ROS_WARN_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_STREAM_THROTTLE_NAMED(rate, suffix, ...)                                      \
+  ROS_WARN_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_FILTER_NAMED(filter, suffix, ...)                                             \
+  ROS_WARN_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_WARN_STREAM_FILTER_NAMED(filter, suffix, ...)                                      \
+  ROS_WARN_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
 
 #define NODELET_ERROR_NAMED(suffix, ...) ROS_ERROR_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_NAMED(suffix, ...) ROS_ERROR_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_ONCE_NAMED(suffix, ...) ROS_ERROR_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_ONCE_NAMED(suffix, ...) ROS_ERROR_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_COND_NAMED(cond, suffix, ...) ROS_ERROR_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_COND_NAMED(cond, suffix, ...) ROS_ERROR_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_THROTTLE_NAMED(rate, suffix, ...) ROS_ERROR_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_THROTTLE_NAMED(rate, suffix, ...) ROS_ERROR_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_FILTER_NAMED(filter, suffix, ...) ROS_ERROR_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_ERROR_STREAM_FILTER_NAMED(filter, suffix, ...) ROS_ERROR_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_NAMED(suffix, ...)                                                    \
+  ROS_ERROR_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_ONCE_NAMED(suffix, ...)                                                      \
+  ROS_ERROR_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_ONCE_NAMED(suffix, ...)                                               \
+  ROS_ERROR_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_COND_NAMED(cond, suffix, ...)                                                \
+  ROS_ERROR_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_COND_NAMED(cond, suffix, ...)                                         \
+  ROS_ERROR_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_THROTTLE_NAMED(rate, suffix, ...)                                            \
+  ROS_ERROR_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_THROTTLE_NAMED(rate, suffix, ...)                                     \
+  ROS_ERROR_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_FILTER_NAMED(filter, suffix, ...)                                            \
+  ROS_ERROR_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_ERROR_STREAM_FILTER_NAMED(filter, suffix, ...)                                     \
+  ROS_ERROR_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
 
 #define NODELET_FATAL_NAMED(suffix, ...) ROS_FATAL_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_NAMED(suffix, ...) ROS_FATAL_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_ONCE_NAMED(suffix, ...) ROS_FATAL_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_ONCE_NAMED(suffix, ...) ROS_FATAL_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_COND_NAMED(cond, suffix, ...) ROS_FATAL_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_COND_NAMED(cond, suffix, ...) ROS_FATAL_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_THROTTLE_NAMED(rate, suffix, ...) ROS_FATAL_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_THROTTLE_NAMED(rate, suffix, ...) ROS_FATAL_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_FILTER_NAMED(filter, suffix, ...) ROS_FATAL_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
-#define NODELET_FATAL_STREAM_FILTER_NAMED(filter, suffix, ...) ROS_FATAL_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_NAMED(suffix, ...)                                                    \
+  ROS_FATAL_STREAM_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_ONCE_NAMED(suffix, ...)                                                      \
+  ROS_FATAL_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_ONCE_NAMED(suffix, ...)                                               \
+  ROS_FATAL_STREAM_ONCE_NAMED(getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_COND_NAMED(cond, suffix, ...)                                                \
+  ROS_FATAL_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_COND_NAMED(cond, suffix, ...)                                         \
+  ROS_FATAL_STREAM_COND_NAMED(cond, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_THROTTLE_NAMED(rate, suffix, ...)                                            \
+  ROS_FATAL_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_THROTTLE_NAMED(rate, suffix, ...)                                     \
+  ROS_FATAL_STREAM_THROTTLE_NAMED(rate, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_FILTER_NAMED(filter, suffix, ...)                                            \
+  ROS_FATAL_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
+#define NODELET_FATAL_STREAM_FILTER_NAMED(filter, suffix, ...)                                     \
+  ROS_FATAL_STREAM_FILTER_NAMED(filter, getSuffixedName(suffix), __VA_ARGS__)
 
 namespace nodelet
 {
@@ -163,24 +221,24 @@ typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
 typedef std::map<std::string, std::string> M_string;
 typedef std::vector<std::string> V_string;
 
-namespace detail {
-	class CallbackQueue;
+namespace detail
+{
+class CallbackQueue;
 }
 
 class UninitializedException : public Exception
 {
 public:
-  UninitializedException(const std::string& method_name)
-  : Exception("Calling [" + method_name + "] before the Nodelet is initialized is not allowed.")
-  {}
+  UninitializedException(const std::string& method_name) :
+      Exception("Calling [" + method_name + "] before the Nodelet is initialized is not allowed.")
+  {
+  }
 };
 
 class MultipleInitializationException : public Exception
 {
 public:
-  MultipleInitializationException()
-  : Exception("Initialized multiple times")
-  {}
+  MultipleInitializationException() : Exception("Initialized multiple times") {}
 };
 
 class NODELETLIB_DECL Nodelet
@@ -203,7 +261,6 @@ protected:
   ros::CallbackQueueInterface& getSTCallbackQueue() const;
   ros::CallbackQueueInterface& getMTCallbackQueue() const;
 
-
   // Internal storage;
 private:
   bool inited_;
@@ -220,6 +277,9 @@ private:
   // Method to be overridden by subclass when starting up.
   virtual void onInit() = 0;
 
+  virtual void
+  onDeInit(){}; // Method to be overridden by subclass when shutting down but ros is still running
+
   // Public API used for launching
 public:
   /**\brief Empty constructor required for dynamic loading */
@@ -228,14 +288,20 @@ public:
   /**\brief Init function called at startup
    * \param name The name of the nodelet
    * \param remapping_args The remapping args in a map for the nodelet
-   * \param my_argv The commandline arguments for this nodelet stripped of special arguments such as ROS arguments
+   * \param my_argv The commandline arguments for this nodelet stripped of special arguments such as
+   * ROS arguments
    */
-  void init(const std::string& name, const M_string& remapping_args, const V_string& my_argv,
+  void init(const std::string& name,
+            const M_string& remapping_args,
+            const V_string& my_argv,
             ros::CallbackQueueInterface* st_queue = NULL,
             ros::CallbackQueueInterface* mt_queue = NULL);
+
+  /**\brief DeInit function called at shutdown */
+  void deinit();
 
   virtual ~Nodelet();
 };
 
-}
-#endif //NODELET_NODELET_H
+} // namespace nodelet
+#endif // NODELET_NODELET_H
