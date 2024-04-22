@@ -278,7 +278,7 @@ private:
   virtual void onInit() = 0;
 
   virtual void
-  onDeInit(){}; // Method to be overridden by subclass when shutting down but ros is still running
+  onDeInit() = 0; // Method to be overridden by subclass when shutting down but ros is still running
 
   // Public API used for launching
 public:

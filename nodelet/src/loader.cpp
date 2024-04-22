@@ -130,6 +130,8 @@ private:
   {
     boost::mutex::scoped_lock lock(lock_);
 
+    ROS_INFO_STREAM("LoaderROS::unload Unloading nodelet: " << name);
+
     bool success = parent_->unload(name);
     if (!success)
     {
@@ -258,7 +260,11 @@ Loader::Loader(const boost::function<boost::shared_ptr<Nodelet>(const std::strin
   impl_->callback_manager_.reset(new detail::CallbackQueueManager);
 }
 
-Loader::~Loader() {}
+Loader::~Loader()
+{
+  std::cout << "Loader::~Loader()" << std::endl;
+  ROS_ERROR_STREAM("Loader::~Loader()");
+}
 
 bool Loader::load(const std::string& name,
                   const std::string& type,
@@ -339,12 +345,21 @@ bool Loader::unload(const std::string& name)
 {
   boost::mutex::scoped_lock lock(lock_);
   Impl::M_stringToNodelet::iterator it = impl_->nodelets_.find(name);
+
+  std::cout << "Loader::unload Unloading nodelet: " << name << std::endl;
+
   if (it != impl_->nodelets_.end())
   {
+    ROS_INFO_STREAM("Calling Deinit on: " << name);
+    std::cout << "Calling Deinit on: " << name << std::endl;
     it->second->nodelet->deinit();
     impl_->nodelets_.erase(it);
     ROS_DEBUG("Done unloading nodelet %s", name.c_str());
     return (true);
+  }
+  else
+  {
+    ROS_ERROR("Failed to find nodelet with name '%s' to unload.", name.c_str());
   }
 
   return (false);

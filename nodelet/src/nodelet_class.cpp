@@ -133,12 +133,7 @@ void Nodelet::init(const std::string& name,
 
 void Nodelet::deinit()
 {
-  if (!inited_)
-  {
-    throw UninitializedException("deinit");
-  }
-
-  NODELET_DEBUG("Nodelet deinitializing");
+  ROS_INFO("Deiniting nodelet %s", nodelet_name_.c_str());
   this->onDeInit();
 }
 } // namespace nodelet
